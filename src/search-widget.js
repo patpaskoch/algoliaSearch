@@ -1,9 +1,9 @@
-console.log("Hello World");
 class SearchWidget extends HTMLElement {
   constructor() {
     super();
-    console.log('Hello World'); 
     this.attachShadow({ mode: 'open' });
+    // Hier kannst du "Hello World" loggen, falls gewünscht
+    console.log('Hello World');
   }
 
   static get observedAttributes() {
@@ -17,6 +17,9 @@ class SearchWidget extends HTMLElement {
   }
 
   connectedCallback() {
+    // Log die aktuellen Attribute, wenn die Komponente verbunden wird
+    console.log('API ID:', this.getAttribute('api-id'));
+    console.log('Search ID:', this.getAttribute('search-id'));
     this.render();
   }
 
@@ -24,6 +27,10 @@ class SearchWidget extends HTMLElement {
     const apiId = this.getAttribute('api-id') || '';
     const searchId = this.getAttribute('search-id') || '';
     const setting1 = this.getAttribute('setting1') || '';
+
+    // Log die Attribute bei jeder Aktualisierung der Render-Methode
+    console.log('API ID (render):', apiId);
+    console.log('Search ID (render):', searchId);
 
     this.shadowRoot.innerHTML = `
       <style>
