@@ -2,62 +2,94 @@ class SearchWidget extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    // Hier kannst du "Hello World" loggen, falls gewünscht
-    console.log('Hello World');
   }
 
   static get observedAttributes() {
-    return ['api-id', 'search-id', 'setting1'];
+    return ['app-id', 'api-key', 'index-name'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name === 'api-id' || name === 'search-id' || name === 'setting1') {
+    if (name === 'app-id' || name === 'api-key' || name === 'index-name') {
       this.render();
     }
   }
 
   connectedCallback() {
-    // Log die aktuellen Attribute, wenn die Komponente verbunden wird
-    console.log('API ID:', this.getAttribute('api-id'));
-    console.log('Search ID:', this.getAttribute('search-id'));
     this.render();
   }
 
-  async render() {
-    const apiId = this.getAttribute('api-id') || '';
-    const searchId = this.getAttribute('search-id') || '';
-    const setting1 = this.getAttribute('setting1') || '';
-
-    // Log die Attribute bei jeder Aktualisierung der Render-Methode
-    console.log('API ID (render):', apiId);
-    console.log('Search ID (render):', searchId);
+  render() {
+    const appId = this.getAttribute('app-id') || '';
+    const apiKey = this.getAttribute('api-key') || '';
+    const indexName = this.getAttribute('index-name') || 'wp_searchable_posts';
 
     this.shadowRoot.innerHTML = `
       <style>
-        .search-widget {
-          display: flex;
-          flex-direction: column;
-          padding: 10px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
+        .ais-InstantSearch {
+          max-width: 960px;
+          width: 100%;
+          display: block;
+          overflow: hidden;
+          margin: 0 auto;
         }
-        input {
-          margin-bottom: 10px;
-          padding: 8px;
+        .ais-SearchBox {
+          margin-bottom: 1em;
+        }
+        .ais-Hits-item {
+          margin-left: 0;
+          width: 100%;
+        }
+        .ais-Hits-item img {
+          margin-right: 1em;
+        }
+        .ais-Hits-list {
+          margin-bottom: 1em;
         }
       </style>
-      <div class="search-widget">
-        <input id="searchQuery" placeholder="Search...">
-        <button id="searchButton">Search</button>
-        <div id="results"></div>
+      <div class="ais-InstantSearch">
+        <div id="searchbox"></div>
+        <div id="hits"></div>
       </div>
-      <script>
-        document.querySelector('#searchButton').addEventListener('click', async () => {
-          const query = document.querySelector('#searchQuery').value;
-          const response = await fetch(\`https://example.com/api/search?query=\${query}&apiId=${apiId}&searchId=${searchId}&setting1=${setting1}\`);
-          const data = await response.json();
-          document.querySelector('#results').innerHTML = 'Results: ' + JSON.stringify(data.results);
+      <script type="module">
+        import algoliasearch from 'https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch.lite.min.js';
+        import instantsearch from 'https://cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js';
+
+        const appId = '${appId}';
+        const apiKey = '${apiKey}';
+        const indexName = '${indexName}';
+
+        const searchClient = algoliasearch(appId, apiKey);
+
+        const search = instantsearch({
+          indexName: indexName,
+          searchClient,
         });
+
+        search.addWidgets([
+          searchBox({
+            container: "#searchbox"
+          }),
+          configure({
+            hitsPerPage: 5
+          }),
+          hits({
+            container: "#hits",
+            templates: {
+              item: (hit, { html, components }) => html\`
+                <div>
+                  <div class="hit-post_title">
+                    \${components.Highlight({ hit, attribute: "post_title" })}
+                  </div>
+                  <div class="hit-content">
+                    \${components.Highlight({ hit, attribute: "content" })}
+                  </div>
+                </div>
+              \`,
+            },
+          }),
+        ]);
+
+        search.start();
       </script>
     `;
   }
