@@ -1,3 +1,4 @@
+console.log("Hello World");
 class SearchWidget extends HTMLElement {
   constructor() {
     super();
