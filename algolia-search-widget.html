@@ -12,7 +12,6 @@
 </head>
 <body>
   <div>Hello World</div>
-  <div id="algolia-search-app">
     <ais-instant-search :search-client="searchClient" index-name="your_index_name">
       <ais-search-box></ais-search-box>
       <ais-hits>
@@ -28,6 +27,7 @@
   </div>
 
   <script>
+    console.log("algolia search widget import")
     new Vue({
       el: '#algolia-search-app',
       data: {
