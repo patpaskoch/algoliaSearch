@@ -2,6 +2,7 @@ console.log("Hello World");
 class SearchWidget extends HTMLElement {
   constructor() {
     super();
+    console.log('Hello World'); 
     this.attachShadow({ mode: 'open' });
   }
 
