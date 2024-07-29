@@ -1,3 +1,4 @@
+console.log('vueloaded')
 /**
  * Minified by jsDelivr using Terser v5.19.2.
  * Original file: /npm/vue@3.4.34/dist/vue.global.js
